@@ -1,0 +1,165 @@
+{% load humanize %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Follow-ups Report</title>
+  <style>
+    @page {
+      size: A4 landscape;
+      margin: 8mm;
+    }
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 9pt;
+      line-height: 1.2;
+      color: #111;
+    }
+
+    h3 { margin: 0 0 8px; font-size: 11pt; }
+    .meta { margin: 0 0 8px; font-size: 8.5pt; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+    thead { display: table-header-group; }
+    tr { break-inside: avoid; page-break-inside: avoid; }
+
+    th, td {
+      border: 0.6px solid #444;
+      padding: 3px;
+      vertical-align: top;
+      text-align: left;
+      font-size: 8pt;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+      hyphens: auto;
+    }
+    thead th {
+      background: #f1f3f5;
+      font-weight: 700;
+      font-size: 8.5pt;
+    }
+
+    colgroup col:nth-child(1)  { width: 3%; }
+    colgroup col:nth-child(2)  { width: 9%; }
+    colgroup col:nth-child(3)  { width: 11%; }
+    colgroup col:nth-child(4)  { width: 9%; }
+    colgroup col:nth-child(5)  { width: 9%; }
+    colgroup col:nth-child(6)  { width: 7%; }
+    colgroup col:nth-child(7)  { width: 14%; }
+    colgroup col:nth-child(8)  { width: 7%; }
+    colgroup col:nth-child(9)  { width: 9%; }
+    colgroup col:nth-child(10) { width: 10%; }
+    colgroup col:nth-child(11) { width: 7%; }
+    colgroup col:nth-child(12) { width: 10%; }
+
+    .badge {
+      display: inline-block;
+      padding: 1px 3px;
+      border-radius: 3px;
+      font-weight: 700;
+      font-size: 7.5pt;
+      color: #fff;
+    }
+    .bg-success { background: #28a745; }
+    .bg-danger  { background: #dc3545; }
+
+    .hr { border: none; border-top: 1px solid #ccc; margin: 6px 0 8px; }
+
+    @media print {
+      body {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      table { page-break-inside: auto; }
+      tr    { page-break-inside: avoid; page-break-after: auto; }
+      thead { display: table-header-group; }
+      tfoot { display: table-footer-group; }
+    }
+  </style>
+</head>
+<body>
+
+  <h3>Follow-ups Report</h3>
+  <p class="meta">
+    {% if created_date %}<strong>Filtered Date:</strong> {{ created_date }}<br>{% endif %}
+    <strong>Total Follow-ups:</strong> {{ total_followups|default:"0" }}<br>
+    <strong>Orders Quoted:</strong> {{ count_order_quoted|default:"0" }}<br>
+    <strong>Payments Collected:</strong> {{ count_payment_collected|default:"0" }}<br>
+    <strong>Total Order Amount:</strong> {{ total_order_amount|default:"0"|floatformat:2|intcomma }}<br>
+    <strong>Total Payment Collected:</strong> {{ total_payment_collected|default:"0"|floatformat:2|intcomma }}
+  </p>
+  <hr class="hr"/>
+
+  <table>
+    <colgroup>
+      <col><col><col><col><col><col><col><col><col><col><col><col>
+    </colgroup>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Production Line</th>
+        <th>Client / Company</th>
+        <th>Contact Person</th>
+        <th>Contact Number</th>
+        <th>Designation</th>
+        <th>Location</th>
+        <th>Order Quoted</th>
+        <th>Order Amount</th>
+        <th>Reason (No Order)</th>
+        <th>Payment Collected</th>
+        <th>Payment Amount</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for f in followups %}
+      <tr>
+        <td>{{ forloop.counter }}</td>
+        <td>{{ f.productionline|default:"-" }}</td>
+        <td>{{ f.company_name|default:"-" }}</td>
+        <td>{{ f.contact_person|default:"-" }}</td>
+        <td>{{ f.contact_number|default:"-" }}</td>
+        <td>{{ f.designation|default:"-" }}</td>
+        <td>
+          {% if f.latitude and f.longitude %}
+            {{ f.place_name }}<br/>
+            <small>{{ f.region }} {{ f.zone }} {{ f.nation }}</small>
+          {% else %}
+            Not Available
+          {% endif %}
+        </td>
+        <td>
+          {% if f.is_order_quoted %}
+            <span class="badge bg-success">Yes</span>
+          {% else %}
+            <span class="badge bg-danger">No</span>
+          {% endif %}
+        </td>
+        <td>
+          {% if f.is_order_quoted %}
+            {{ f.order_amount|default:"0"|floatformat:2|intcomma }}
+          {% else %}-{% endif %}
+        </td>
+        <td>{{ f.reason_no_order|default:"N/A" }}</td>
+        <td>
+          {% if f.is_payment_collected %}
+            <span class="badge bg-success">Yes</span>
+          {% else %}
+            <span class="badge bg-danger">No</span>
+          {% endif %}
+        </td>
+        <td>
+          {% if f.is_payment_collected %}
+            {{ f.payment_amount|default:"0"|floatformat:2|intcomma }}
+          {% else %}-{% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+</body>
+</html>

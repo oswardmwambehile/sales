@@ -1,0 +1,66 @@
+{% extends "manager/base.html" %}
+{% load static %}
+
+{% block content %}
+  {% include "manager/sidebar.html" %}
+  <div class="main-panel">
+    <div class="main-header">
+      <div class="main-header-logo">
+        <div class="logo-header" data-background-color="dark">
+          <a href="index.html" class="logo">
+            <img
+              src="{% static 'assets/img/kaiadmin/logo_light.svg' %}"
+              alt="navbar brand"
+              class="navbar-brand"
+              height="20"
+            />
+          </a>
+          <div class="nav-toggle">
+            <button class="btn btn-toggle toggle-sidebar"><i class="gg-menu-right"></i></button>
+            <button class="btn btn-toggle sidenav-toggler"><i class="gg-menu-left"></i></button>
+          </div>
+          <button class="topbar-toggler more"><i class="gg-more-vertical-alt"></i></button>
+        </div>
+      </div>
+      {% include "manager/nav.html" %}
+    </div>
+
+    <div class="container">
+      <div class="page-inner">
+        <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row pt-2 pb-4">
+          <div>
+            
+          </div>
+          
+        </div>
+
+        <!-- Stats -->
+
+
+    <h1 class="mb-4">Select Type of Visit</h1>
+
+<div class="d-flex flex-column gap-3" style="max-width: 300px;">
+  <a href="{% url 'new_visit' %}" class="btn btn-outline-primary btn-lg">
+    New Visit
+  </a>
+  <a href="{%url 'new_followup' %}" class="btn btn-outline-secondary btn-lg">
+    Follow-Up Visit
+  </a>
+</div>
+
+
+
+
+
+        <!-- Charts -->
+       
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+
+
+
+
+

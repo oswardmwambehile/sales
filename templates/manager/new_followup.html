@@ -1,0 +1,252 @@
+{% extends "manager/base.html" %}
+{% load static %}
+
+{% block content %}
+  {% include "manager/sidebar.html" %}
+  <div class="main-panel">
+    <div class="main-header">
+      {% include "manager/nav.html" %}
+    </div>
+
+    <div class="container">
+      <div class="page-inner">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h1 class="mb-0">Add Follow Up</h1>
+          <a href="{% url 'add_visit' %}" class="btn btn-outline-primary btn-sm">🏠 Home</a>
+        </div>
+
+        <form method="post" id="multiStepForm" class="d-flex flex-column gap-4">
+          {% csrf_token %}
+
+          <!-- STEP 1 -->
+          <div class="step" id="step-1">
+            <h5>Step 1: Client & Meeting Info</h5>
+            <div class="row">
+              <div class="col-md-6 mb-3">{{ form.productionline.label_tag }} {{ form.productionline }}</div>
+              <div class="col-md-6 mb-3">{{ form.designation.label_tag }} {{ form.designation }}</div>
+            </div>
+            <div class="row">
+              <div class="col-md-6 mb-3">{{ form.company_name.label_tag }} {{ form.company_name }}</div>
+              <div class="col-md-6 mb-3">{{ form.contact_person.label_tag }} {{ form.contact_person }}</div>
+            </div>
+            <div class="row">
+              <div class="col-md-6 mb-3">{{ form.contact_number.label_tag }} {{ form.contact_number }}</div>
+              <div class="col-md-6 mb-3">{{ form.meeting_purpose.label_tag }} {{ form.meeting_purpose }}</div>
+            </div>
+
+            <!-- Map -->
+            {{ form.latitude }} {{ form.longitude }}
+            <label class="form-label">Pin Location</label>
+            <div id="map" style="height:350px; width:100%;" class="mb-2 border"></div>
+            <div id="location-details" class="p-2 border rounded small text-muted">Please allow location access…</div>
+
+            <button type="button" class="btn btn-primary mt-3 next-step">Next</button>
+          </div>
+
+          <!-- STEP 2 -->
+          <div class="step d-none" id="step-2">
+            <h5>Step 2: Meeting Outcome & Discussion</h5>
+            <div class="mb-3">{{ form.meeting_outcome.label_tag }} {{ form.meeting_outcome }}</div>
+            <div class="mb-3">{{ form.item_discussed.label_tag }} {{ form.item_discussed }}</div>
+            <button type="button" class="btn btn-danger prev-step">Back</button>
+            <button type="button" class="btn btn-primary next-step">Next</button>
+          </div>
+
+          <!-- STEP 3 -->
+          <div class="step d-none" id="step-3">
+            <h5>Step 3: Order Quotation</h5>
+            <div class="mb-3">
+              <label for="is_order_quoted">Order Quoted?</label>
+              <select id="is_order_quoted" name="is_order_quoted" class="form-select">
+                <option value="">Select...</option>
+                <option value="True">Yes</option>
+                <option value="False">No</option>
+              </select>
+            </div>
+            <div id="orderAmountRow" class="mb-3 d-none">{{ form.order_amount.label_tag }} {{ form.order_amount }}</div>
+            <div id="reasonNoOrderRow" class="mb-3 d-none">{{ form.reason_no_order.label_tag }} {{ form.reason_no_order }}</div>
+            <button type="button" class="btn btn-danger prev-step">Back</button>
+            <button type="button" class="btn btn-primary next-step">Next</button>
+          </div>
+
+          <!-- STEP 4 -->
+          <div class="step d-none" id="step-4">
+            <h5>Step 4: Payment Collection</h5>
+            <div class="mb-3">
+              <label for="is_payment_collected">Payment Collected?</label>
+              <select id="is_payment_collected" name="is_payment_collected" class="form-select">
+                <option value="">Select...</option>
+                <option value="True">Yes</option>
+                <option value="False">No</option>
+              </select>
+            </div>
+            <div id="paymentAmountRow" class="mb-3 d-none">{{ form.payment_amount.label_tag }} {{ form.payment_amount }}</div>
+            <div id="reasonNoPaymentRow" class="mb-3 d-none">{{ form.reason_no_payment.label_tag }} {{ form.reason_no_payment }}</div>
+            <button type="button" class="btn btn-danger prev-step">Back</button>
+            <button type="submit" class="btn btn-primary">Save FollowUp</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Styles same as new_visit -->
+  <style>
+    form input, form select, form textarea { background: transparent !important; }
+    #map { border-radius: 6px; }
+  </style>
+
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <script>
+document.addEventListener("DOMContentLoaded", function() {
+  let currentStep = 1;
+  const steps = document.querySelectorAll(".step");
+
+  function showStep(n) {
+    steps.forEach((s, i) => s.classList.toggle("d-none", i !== n - 1));
+  }
+
+  document.querySelectorAll(".next-step").forEach(b => b.onclick = () => {
+    if (currentStep < steps.length) {
+      currentStep++;
+      showStep(currentStep);
+    }
+  });
+
+  document.querySelectorAll(".prev-step").forEach(b => b.onclick = () => {
+    if (currentStep > 1) {
+      currentStep--;
+      showStep(currentStep);
+    }
+  });
+
+  // ---------------- Order toggle ----------------
+  const orderSel = document.querySelector("#is_order_quoted"),   // ✅ fixed ID
+        orderAmt = document.querySelector("#orderAmountRow"),
+        reasonNoOrder = document.querySelector("#reasonNoOrderRow");
+
+  if (orderSel) {
+    orderSel.addEventListener("change", () => {
+      if (orderSel.value === "True") {
+        orderAmt.classList.remove("d-none");
+        reasonNoOrder.classList.add("d-none");
+      } else if (orderSel.value === "False") {
+        orderAmt.classList.add("d-none");
+        reasonNoOrder.classList.remove("d-none");
+      } else {
+        orderAmt.classList.add("d-none");
+        reasonNoOrder.classList.add("d-none");
+      }
+    });
+  }
+
+  // ---------------- Payment toggle ----------------
+  const paySel = document.querySelector("#is_payment_collected"),   // ✅ fixed ID
+        payAmt = document.querySelector("#paymentAmountRow"),
+        reasonNoPay = document.querySelector("#reasonNoPaymentRow");
+
+  if (paySel) {
+    paySel.addEventListener("change", () => {
+      if (paySel.value === "True") {
+        payAmt.classList.remove("d-none");
+        reasonNoPay.classList.add("d-none");
+      } else if (paySel.value === "False") {
+        payAmt.classList.add("d-none");
+        reasonNoPay.classList.remove("d-none");
+      } else {
+        payAmt.classList.add("d-none");
+        reasonNoPay.classList.add("d-none");
+      }
+    });
+  }
+
+  // ---------------- Company -> contacts ----------------
+  const company = document.querySelector("#id_company_name"),
+        contact = document.querySelector("#id_contact_person"),
+        phone   = document.querySelector("#id_contact_number"),
+        desig   = document.querySelector("#id_designation");
+
+  if (company) {
+    company.addEventListener("change", () => {
+      const id = company.value;
+      phone.value = "";
+      desig.value = "";
+      if (!id) {
+        contact.innerHTML = "<option>Select company first</option>";
+        return;
+      }
+      fetch(`/get-contacts/${id}/`)
+        .then(r => r.json())
+        .then(data => {
+          contact.innerHTML = "<option value=''>Select contact</option>";
+          data.contacts.forEach(c => {
+            const o = document.createElement("option");
+            o.value = c.id;
+            o.textContent = c.name;
+            contact.appendChild(o);
+          });
+        });
+    });
+  }
+
+  if (contact) {
+    contact.addEventListener("change", () => {
+      const id = contact.value;
+      if (!id) return;
+      fetch(`/get-contact-details/${id}/`)
+        .then(r => r.json())
+        .then(data => {
+          if (data.contact_number) phone.value = data.contact_number;
+          if (data.designation) desig.value = data.designation;
+        });
+    });
+  }
+
+  // ---------------- MAP ----------------
+  const lat     = document.querySelector("#id_latitude"),
+        lon     = document.querySelector("#id_longitude"),
+        details = document.querySelector("#location-details");
+
+  const map = L.map("map").setView([-6.7924, 39.2083], 13);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
+  let marker = null;
+
+  function updatePos(pos) {
+    const la = pos.coords.latitude.toFixed(6);
+    const lo = pos.coords.longitude.toFixed(6);
+
+    lat.value = la;
+    lon.value = lo;
+
+    if (!marker) marker = L.marker([la, lo]).addTo(map);
+    else marker.setLatLng([la, lo]);
+    map.setView([la, lo], 17);
+
+    details.textContent = `Location: ${la}, ${lo} (accuracy ~${Math.round(pos.coords.accuracy)}m)`;
+  }
+
+  if (navigator.geolocation) {
+    navigator.geolocation.watchPosition(
+      updatePos,
+      () => { details.textContent = "Location access denied"; },
+      { enableHighAccuracy: true }
+    );
+  }
+
+  // ---------------- Validate before submit ----------------
+  document.querySelector("#multiStepForm").addEventListener("submit", function(e) {
+    if (!lat.value || !lon.value) {
+      e.preventDefault();
+      alert("Location not detected yet. Please allow location access.");
+    }
+  });
+
+  showStep(currentStep);
+});
+</script>
+
+{% endblock %}

@@ -1,0 +1,140 @@
+{% extends "manager/base.html" %}
+{% load static %}
+
+{% block content %}
+  {% include "manager/sidebar.html" %}
+  <div class="main-panel">
+    <div class="main-header">
+      <div class="main-header-logo">
+        <div class="logo-header" data-background-color="dark">
+          <a href="index.html" class="logo">
+            <img
+              src="{% static 'assets/img/kaiadmin/logo_light.svg' %}"
+              alt="navbar brand"
+              class="navbar-brand"
+              height="20"
+            />
+          </a>
+          <div class="nav-toggle">
+            <button class="btn btn-toggle toggle-sidebar"><i class="gg-menu-right"></i></button>
+            <button class="btn btn-toggle sidenav-toggler"><i class="gg-menu-left"></i></button>
+          </div>
+          <button class="topbar-toggler more"><i class="gg-more-vertical-alt"></i></button>
+        </div>
+      </div>
+      {% include "manager/nav.html" %}
+    </div>
+
+    <div class="container">
+      <div class="page-inner">
+        <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row pt-2 pb-4">
+          <div>
+            
+          </div>
+          
+        </div>
+
+        <!-- Stats -->
+<div class="d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+  <div class="w-100" style="max-width: 800px;">
+
+    <!-- Welcome Heading -->
+    <h1 class="fw-bold text-center mb-3">
+      <span style="
+        font-size: 48px;
+        font-weight: 800;
+        background: linear-gradient(90deg, #ff416c, #ff4b2b);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        display: inline-block;
+      ">
+        Welcome
+      </span>
+
+      <span style="
+        font-size: 42px;
+        font-weight: 700;
+        background: linear-gradient(90deg, #00c6ff, #0072ff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-left: 8px;
+      ">
+        {{ request.user.first_name|default:"User" }}
+      </span>
+
+      <span style="
+        font-size: 42px;
+        font-weight: 700;
+        background: linear-gradient(90deg, #42e695, #3bb2b8);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-left: 6px;
+      ">
+        {{ request.user.last_name|default:"User" }}!
+      </span>
+    </h1>
+
+    <!-- Separator -->
+    <hr style="height: 4px; border: none; background: linear-gradient(90deg, #ff416c, #0072ff, #42e695); opacity: 0.9; margin: 20px 0; border-radius: 3px;">
+
+    <!-- Description -->
+    <p class="text-secondary fs-5 text-center mb-4" style="line-height: 1.6;">
+      Stay on top of your appointments with our visit tracking system.  
+      Easily schedule, manage, and review your visits — all in one place.  
+      Keep everything organized and never miss a follow-up again.
+    </p>
+
+    <!-- CTA Button -->
+    <div class="text-center">
+      <a href="{% url 'select_vist' %}" 
+         class="gradient-btn">
+        <i class="fa fa-calendar-plus me-2"></i> Add Visits
+      </a>
+    </div>
+
+  </div>
+</div>
+
+<style>
+  .gradient-btn {
+    display: inline-block;
+    font-size: 1.25rem; /* Bigger text */
+    font-weight: 600;
+    padding: 14px 40px;
+    color: #fff !important;
+    background: linear-gradient(90deg, #0072ff, #00c6ff);
+    border: none;
+    border-radius: 50px;
+    box-shadow: 0 6px 15px rgba(0, 114, 255, 0.3);
+    transition: all 0.3s ease;
+    text-decoration: none;
+  }
+
+  .gradient-btn:hover {
+    background: linear-gradient(90deg, #00c6ff, #0072ff);
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 10px 25px rgba(0, 114, 255, 0.45);
+  }
+
+  .gradient-btn i {
+    font-size: 1.3rem;
+    vertical-align: middle;
+  }
+</style>
+
+
+
+
+
+        <!-- Charts -->
+       
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+
+
+
+
+

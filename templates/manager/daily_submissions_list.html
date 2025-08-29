@@ -1,0 +1,84 @@
+{% extends "manager/base.html" %}
+{% load static %}
+
+{% block content %}
+  {% include "manager/sidebar.html" %}
+  <div class="main-panel">
+    <div class="main-header">
+      {% include "manager/nav.html" %}
+    </div>
+
+    <div class="container">
+      <div class="page-inner">
+        <div class="d-flex justify-content-between align-items-center mt-4 mb-3">
+          <h3 class="mb-0">Daily Forms List</h3>
+          <a href="{% url 'select_vist' %}" class="btn btn-primary btn-sm">
+            ➕ Add Visit
+          </a>
+        </div>
+
+        {% if forms %}
+        <div class="table-responsive">
+          <table class="table table-bordered align-middle custom-table w-100">
+            <thead>
+              <tr>
+                <th>SN</th>
+                <th>Created Date</th>
+                <th>User</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for form in forms %}
+              <tr>
+                <td>{{ form.serial_number }}</td>
+                <td>{{ form.created_at|date:"Y-m-d H:i" }}</td>
+                <td>{{ form.user.first_name }}</td>
+                <td>
+                  {% if form.submission %}
+                    {% if form.submission.final_status == "approved" %}
+                      <span class="badge bg-success">✅ Approved</span>
+                    {% elif form.submission.final_status == "rejected" %}
+                      <span class="badge bg-danger">❌ Rejected</span>
+                    {% elif form.submission.final_status == "resubmite" %}
+                      <span class="badge bg-warning text-dark">🔄 Resubmit</span>
+                    {% else %}
+                      <span class="badge bg-secondary">📂 Opened</span>
+                    {% endif %}
+                  {% else %}
+                    <span class="badge bg-light text-dark">⏳ Not Submitted</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <a href="{% url 'submission_detail' form.id %}" 
+                     class="btn btn-sm btn-outline-primary">
+                    👁️ View Form Detail
+                  </a>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+          <p>No forms found.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <style>
+    .custom-table th, 
+    .custom-table td {
+      white-space: nowrap; 
+      vertical-align: middle;
+      padding: 8px 12px;
+    }
+    .custom-table thead th {
+      background: none !important;
+      font-weight: 600;
+      border-bottom: 2px solid #ccc;
+    }
+  </style>
+{% endblock %}

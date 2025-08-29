@@ -1,0 +1,449 @@
+{% extends "manager/base.html" %}
+{% load static %}
+
+{% block content %}
+  {% include "manager/sidebar.html" %}
+  <div class="main-panel">
+    <div class="main-header">
+      {% include "manager/nav.html" %}
+    </div>
+
+    <div class="container">
+      <div class="page-inner">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h1 class="mb-0">Add New Visit</h1>
+          <a href="{% url 'add_visit' %}" class="btn btn-outline-primary btn-sm">🏠 Home</a>
+        </div>
+
+        <!-- Multi-step form -->
+        <form method="post" id="multiStepForm" class="d-flex flex-column gap-4">
+          {% csrf_token %}
+
+          <!-- Step 1 -->
+          <div class="step" id="step-1">
+            <h5 class="mb-3">Step 1: Client & Meeting Info</h5>
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                {{ form.productionline.label_tag }}
+                {{ form.productionline }}
+                <div class="text-danger small">{{ form.productionline.errors|default:"" }}</div>
+              </div>
+
+              <div class="col-md-6 mb-3">
+                {{ form.designation.label_tag }}
+                {{ form.designation }}
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                {{ form.company_name.label_tag }}
+                {{ form.company_name }}
+              </div>
+              <div class="col-md-6 mb-3">
+                {{ form.contact_person.label_tag }}
+                {{ form.contact_person }}
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                {{ form.contact_number.label_tag }}
+                {{ form.contact_number }}
+              </div>
+              <div class="col-md-6 mb-3">
+                {{ form.meeting_purpose.label_tag }}
+                {{ form.meeting_purpose }}
+              </div>
+            </div>
+
+            <!-- Map -->
+            {{ form.latitude }} {{ form.longitude }}
+            <label class="form-label">Pin Location</label>
+            <div id="map" style="height:350px; width:100%;" class="mb-2 border"></div>
+            <div id="location-details" class="p-2 border rounded small text-muted">Please allow location access…</div>
+
+            <button type="button" class="btn btn-primary mt-3 next-step">Next</button>
+          </div>
+
+          <!-- Step 2 (merged Step 2 + Step 3) -->
+          <div class="step d-none" id="step-2">
+            <h5 class="mb-3">Step 2: Meeting Outcome & Items Discussed</h5>
+
+            <div class="mb-3">
+              {{ form.meeting_outcome.label_tag }}
+              {{ form.meeting_outcome }}
+            </div>
+
+            <div class="mb-3">
+              {{ form.item_discussed.label_tag }}
+              {{ form.item_discussed }}
+            </div>
+
+            <button type="button" class="btn btn-danger prev-step">Back</button>
+            <button type="button" class="btn btn-primary next-step">Next</button>
+          </div>
+
+          <!-- Step 3 (was Step 4) -->
+          <div class="step d-none" id="step-3">
+            <h5 class="mb-3">Step 3: Order Quotation</h5>
+
+            <div class="mb-3">
+              <!-- keep your manual select name/id so form.clean() can read it -->
+              <label for="is_order_quoted">Order Quoted?</label>
+              <select id="is_order_quoted" name="is_order_quoted" class="form-select">
+                <option value="">Select...</option>
+                <option value="True">Yes</option>
+                <option value="False">No</option>
+              </select>
+            </div>
+
+            <div id="orderAmountRow" class="mb-3 d-none">
+              {{ form.order_amount.label_tag }}
+              {{ form.order_amount }}
+              <div class="text-danger small">{{ form.order_amount.errors|default:"" }}</div>
+            </div>
+
+            <div id="reasonNoOrderRow" class="mb-3 d-none">
+              {{ form.reason_no_order.label_tag }}
+              {{ form.reason_no_order }}
+              <div class="text-danger small">{{ form.reason_no_order.errors|default:"" }}</div>
+            </div>
+
+            <button type="button" class="btn btn-danger prev-step">Back</button>
+            <button type="submit" class="btn btn-primary">Save Visit</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+<style>
+  /* Panel & container */
+  .main-panel {
+    margin-left: 220px;
+  }
+  .page-inner {
+    padding: 20px !important;
+  }
+
+  /* Headings */
+  h1, h5 {
+    font-weight: 600;
+    color: #222;
+  }
+
+  /* Inputs, selects, textarea (Bootstrap override) */
+  form input,
+  form select,
+  form textarea,
+  .form-control {
+    width: 100%;
+    background: transparent !important;   /* ✅ no white background */
+    border: 1px solid #ccc !important;
+    border-radius: 6px !important;
+    padding: 10px !important;
+    font-size: 0.95rem !important;
+    color: #222 !important;
+    box-shadow: none !important;
+    transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+  }
+
+  /* Hover effect */
+  form input:hover,
+  form select:hover,
+  form textarea:hover,
+  .form-control:hover {
+    background-color: rgba(0,0,0,0.03) !important;  /* light gray hint */
+  }
+
+  /* Focus state */
+  form input:focus,
+  form select:focus,
+  form textarea:focus,
+  .form-control:focus {
+    border-color: #007bff !important;
+    outline: none !important;
+    background: transparent !important;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,.15) !important;
+  }
+
+  /* Placeholder style */
+  ::placeholder {
+    color: #888 !important;
+    opacity: 1;
+  }
+
+  /* Select placeholder */
+  select option:first-child {
+    color: #888;
+  }
+
+  /* Buttons */
+  .btn {
+    border-radius: 6px;
+    font-weight: 500;
+    padding: 10px 18px;
+  }
+
+  /* Map & location details */
+  #map {
+    border: 1px solid #ccc;
+    border-radius: 6px;
+  }
+  #location-details {
+    background: #fafafa;
+  }
+
+  /* Responsive layout */
+  @media (max-width: 768px) {
+    .main-panel {
+      margin-left: 0;
+    }
+    h1 {
+      font-size: 1.4rem;
+    }
+    h5 {
+      font-size: 1.1rem;
+    }
+    .btn {
+      font-size: 0.9rem;
+      padding: 8px 14px;
+    }
+    .row > [class*="col-"] {
+      flex: 0 0 100%;
+      max-width: 100%;
+    }
+  }
+</style>
+
+
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <script>
+  document.addEventListener("DOMContentLoaded", function() {
+    // --------------------------
+    // MULTI-STEP (unchanged)
+    // --------------------------
+    let currentStep = 1;
+    const steps = document.querySelectorAll(".step");
+    function showStep(step) {
+      steps.forEach((s, i) => s.classList.toggle("d-none", i !== step - 1));
+    }
+    document.querySelectorAll(".next-step").forEach(btn => {
+      btn.addEventListener("click", () => {
+        if (currentStep < steps.length) { currentStep++; showStep(currentStep); }
+      });
+    });
+    document.querySelectorAll(".prev-step").forEach(btn => {
+      btn.addEventListener("click", () => {
+        if (currentStep > 1) { currentStep--; showStep(currentStep); }
+      });
+    });
+
+    // --------------------------
+    // SHOW/HIDE quotation rows
+    // --------------------------
+    const selectQuoted = document.querySelector("#is_order_quoted");
+    const orderAmountRow = document.querySelector("#orderAmountRow");
+    const reasonNoOrderRow = document.querySelector("#reasonNoOrderRow");
+    function syncQuoteUI() {
+      const v = selectQuoted.value;
+      if (v === "True") {
+        orderAmountRow.classList.remove("d-none");
+        reasonNoOrderRow.classList.add("d-none");
+      } else if (v === "False") {
+        orderAmountRow.classList.add("d-none");
+        reasonNoOrderRow.classList.remove("d-none");
+      } else {
+        orderAmountRow.classList.add("d-none");
+        reasonNoOrderRow.classList.add("d-none");
+      }
+    }
+    selectQuoted.addEventListener("change", syncQuoteUI);
+    syncQuoteUI(); // in case of re-render with errors
+
+    // --------------------------
+    // COMPANY -> CONTACTS (AJAX)
+    // CONTACT -> fills number & designation (AJAX)
+    // --------------------------
+    const companySelect = document.querySelector("#id_company_name");
+    const contactSelect = document.querySelector("#id_contact_person");
+    const contactNumberInput = document.querySelector("#id_contact_number");
+    const designationInput = document.querySelector("#id_designation");
+
+    function setContactPlaceholder(msg) {
+      contactSelect.innerHTML = "";
+      const opt = document.createElement("option");
+      opt.value = "";
+      opt.textContent = msg;
+      contactSelect.appendChild(opt);
+    }
+
+    // On company change -> load contacts
+    if (companySelect) {
+      companySelect.addEventListener("change", function() {
+        const companyId = this.value;
+        contactNumberInput.value = "";
+        designationInput.value = "";
+
+        if (!companyId) {
+          setContactPlaceholder("Select company first");
+          return;
+        }
+
+        setContactPlaceholder("Loading…");
+        fetch(`/get-contacts/${companyId}/`, { headers: { "X-Requested-With": "XMLHttpRequest" }})
+          .then(r => r.ok ? r.json() : Promise.reject())
+          .then(data => {
+            contactSelect.innerHTML = "";
+            const first = document.createElement("option");
+            first.value = "";
+            first.textContent = "Select contact";
+            contactSelect.appendChild(first);
+
+            (data.contacts || []).forEach(c => {
+              const opt = document.createElement("option");
+              opt.value = c.id;
+              opt.textContent = c.name;
+              contactSelect.appendChild(opt);
+            });
+          })
+          .catch(() => setContactPlaceholder("Failed to load contacts"));
+      });
+    }
+
+    // On contact change -> fill phone + designation
+    if (contactSelect) {
+      contactSelect.addEventListener("change", function() {
+        const contactId = this.value;
+        contactNumberInput.value = "";
+        designationInput.value = "";
+
+        if (!contactId) return;
+
+        fetch(`/get-contact-details/${contactId}/`, { headers: { "X-Requested-With": "XMLHttpRequest" }})
+          .then(r => r.ok ? r.json() : Promise.reject())
+          .then(data => {
+            if (data.contact_number) contactNumberInput.value = data.contact_number;
+            if (data.designation) designationInput.value = data.designation;
+          })
+          .catch(() => {});
+      });
+    }
+
+    // --------------------------
+    // MAP / LOCATION
+    // --------------------------
+    const latInput = document.querySelector("#id_latitude");
+    const lonInput = document.querySelector("#id_longitude");
+    const detailsDiv = document.querySelector("#location-details");
+
+    const map = L.map("map", { zoomControl: true }).setView([-6.7924, 39.2083], 13);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19 }).addTo(map);
+
+    let marker = null;
+    let accuracyCircle = null;
+    let bestAccuracy = Infinity;
+
+    function toNum(v) { return typeof v === "number" ? v : parseFloat(v); }
+    function setTightBounds(lat, lon, delta) {
+      const _lat = toNum(lat), _lon = toNum(lon), _d = toNum(delta);
+      const sw = L.latLng(_lat - _d, _lon - _d);
+      const ne = L.latLng(_lat + _d, _lon + _d);
+      const bounds = L.latLngBounds(sw, ne);
+      map.setMaxBounds(bounds.pad(0.2));
+      map.fitBounds(bounds, { maxZoom: 18 });
+    }
+
+    function updateMap(lat, lon, accMeters) {
+      const _lat = toNum(lat), _lon = toNum(lon);
+      const _acc = Math.max(5, Math.round(toNum(accMeters || 0)));
+
+      if (!marker) marker = L.marker([_lat, _lon], { keyboard: false, draggable: false }).addTo(map);
+      else marker.setLatLng([_lat, _lon]);
+
+      if (accuracyCircle) accuracyCircle.remove();
+      accuracyCircle = L.circle([_lat, _lon], { radius: _acc }).addTo(map);
+
+      map.setView([_lat, _lon], 18);
+      setTightBounds(_lat, _lon, 0.005);
+
+      fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${_lat}&lon=${_lon}&zoom=18&addressdetails=1`)
+        .then(r => r.json())
+        .then(data => {
+          const addr = data.address || {};
+          const place = data.display_name || addr.city || addr.town || addr.village || "N/A";
+          const zone = addr.county || addr.district || "N/A";
+          const region = addr.state || "N/A";
+          const country = addr.country || "N/A";
+          const html = `
+            <strong>Detected Place:</strong> ${place}<br>
+            <strong>Zone:</strong> ${zone}<br>
+            <strong>Region:</strong> ${region}<br>
+            <strong>Nation:</strong> ${country}<br>
+            <em>Accuracy: ~${_acc}m</em>
+          `;
+          detailsDiv.innerHTML = html;
+          marker.bindPopup(html);
+        })
+        .catch(() => {
+          detailsDiv.textContent = `Location detected (${_lat}, ${_lon}) — address lookup failed.`;
+        });
+    }
+
+    function usePosition(position) {
+      const lat = parseFloat(position.coords.latitude.toFixed(6));
+      const lon = parseFloat(position.coords.longitude.toFixed(6));
+      const acc = typeof position.coords.accuracy === "number" ? position.coords.accuracy : 9999;
+      latInput.value = String(lat);
+      lonInput.value = String(lon);
+      if (acc < bestAccuracy - 5 || !isFinite(bestAccuracy)) {
+        bestAccuracy = acc;
+        updateMap(lat, lon, acc);
+      }
+      if (detailsDiv.textContent.includes("Please allow")) {
+        detailsDiv.textContent = "Detecting location…";
+      }
+    }
+
+    function onLocateError(err) {
+      console.error("Geolocation error:", err);
+      detailsDiv.textContent = (err && err.code === 1)
+        ? "Location permission denied. Please allow location access."
+        : "Unable to detect location. Please enable location services.";
+    }
+
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(usePosition, onLocateError, {
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 0
+      });
+
+      const watchId = navigator.geolocation.watchPosition(
+        usePosition,
+        (err) => console.warn("watchPosition error:", err),
+        { enableHighAccuracy: true, maximumAge: 0 }
+      );
+      setTimeout(() => navigator.geolocation.clearWatch(watchId), 60000);
+    } else {
+      detailsDiv.textContent = "Your browser does not support geolocation.";
+    }
+
+    // Block submit until lat/lon are set
+    document.querySelector("#multiStepForm").addEventListener("submit", function(e) {
+      if (!latInput.value || !lonInput.value) {
+        e.preventDefault();
+        alert("Location not detected. Please allow location access and wait.");
+      }
+    });
+
+    showStep(currentStep);
+  });
+  </script>
+{% endblock %}

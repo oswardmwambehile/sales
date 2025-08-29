@@ -1,0 +1,218 @@
+{% extends "manager/base.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block content %}
+  {% include "manager/sidebar.html" %}
+  <div class="main-panel">
+    <div class="main-header">
+      {% include "manager/nav.html" %}
+    </div>
+
+    <div class="container">
+      <div class="page-inner">
+        <div class="container mt-4">
+          <h3 class="mb-3">Daily Follow-ups</h3>
+
+          <!-- 🔍 Filter -->
+<form method="get" class="row g-3 mb-4 align-items-end">
+  <!-- Date Filter -->
+  <div class="col-12 col-md-4">
+    <label class="form-label">Created Date</label>
+    <input type="date" name="created_date" class="form-control" value="{{ created_date }}">
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="col-12 col-md-8">
+    <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+      <button type="submit" class="btn btn-primary">
+        🔍 Filter
+      </button>
+
+      <a href="{% url 'daily_followup_listing' %}" class="btn btn-secondary">
+        ♻️ Reset
+      </a>
+
+      <a href="{% url 'export_followups_pdf' %}?{% if created_date %}created_date={{ created_date }}{% endif %}" 
+         class="btn btn-success"
+         target="_blank">
+        ⬇️ Download PDF
+      </a>
+    </div>
+  </div>
+</form>
+
+         <!-- 📊 Totals -->
+<div class="mb-4">
+  {% if created_date %}
+    <h5 class="fw-bold text-primary">Totals for {{ created_date }}:</h5>
+  {% else %}
+    <h5 class="fw-bold text-primary">Totals (All Time):</h5>
+  {% endif %}
+
+  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3 mt-3">
+    <div class="col">
+      <div class="border rounded p-3 bg-light">
+        <h6 class="text-muted mb-1">Total Follow-ups</h6>
+        <p class="fs-5 fw-bold mb-0">{{ total_followups }}</p>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="border rounded p-3 bg-light">
+        <h6 class="text-muted mb-1">Follow-ups with Orders Quoted</h6>
+        <p class="fs-5 fw-bold mb-0">{{ count_order_quoted }}</p>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="border rounded p-3 bg-light">
+        <h6 class="text-muted mb-1">Follow-ups with Payments Collected</h6>
+        <p class="fs-5 fw-bold mb-0">{{ count_payment_collected }}</p>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="border rounded p-3 bg-light">
+        <h6 class="text-muted mb-1">Total Order Amount</h6>
+        <p class="fs-5 fw-bold mb-0">{{ total_order_amount|floatformat:2|intcomma }}</p>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="border rounded p-3 bg-light">
+        <h6 class="text-muted mb-1">Total Payment Collected</h6>
+        <p class="fs-5 fw-bold mb-0">{{ total_payment_collected|floatformat:2|intcomma }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h4 class="mb-3">Follow-ups ({{ followups.paginator.count }})</h4>
+<hr>
+
+
+          {% if followups %}
+          <div class="table-responsive">
+            <table class="table table-bordered table-striped align-middle w-100 custom-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Production Line</th>
+                  <th>Client / Company</th>
+                  <th>Contact Person</th>
+                  <th>Contact Number</th>
+                  <th>Designation</th>
+                  <th>Location</th>
+                  <th>Meeting Purpose</th>
+                  <th>Outcome</th>
+                  <th>Item Discussed</th>
+                  <th>Order Quoted</th>
+                  <th>Order Amount</th>
+                  <th>Reason (if No Order)</th>
+                  <th>Payment Collected</th>
+                  <th>Payment Amount</th>
+                  <th>Reason (if No Payment)</th>
+                  <th>Created At</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for f in followups %}
+                <tr>
+                  <td>{{ forloop.counter0|add:followups.start_index }}</td>
+                  <td>{{ f.productionline|default:"-" }}</td>
+                  <td>{{ f.company_name|default:"-" }}</td>
+                  <td>{{ f.contact_person|default:"-" }}</td>
+                  <td>{{ f.contact_number|default:"-" }}</td>
+                  <td>{{ f.designation|default:"-" }}</td>
+                  <td>
+                    {% if f.latitude and f.longitude %}
+                      📍 {{ f.place_name }}<br>
+                      <small>{{ f.region }} {{ f.zone }} {{ f.nation }}</small><br>
+                      <a href="https://www.google.com/maps/search/?api=1&query={{ f.latitude }},{{ f.longitude }}"
+                         target="_blank" class="ms-1 text-decoration-none">[View on Map]</a>
+                    {% else %}
+                      <span class="text-muted">Not Available</span>
+                    {% endif %}
+                  </td>
+                  <td>{{ f.meeting_purpose|default:"-" }}</td>
+                  <td>{{ f.meeting_outcome|default:"-" }}</td>
+                  <td>{{ f.item_discussed|default:"-" }}</td>
+                  <td>
+                    {% if f.is_order_quoted %}
+                      ✅ Yes
+                    {% else %}
+                      ❌ No
+                    {% endif %}
+                  </td>
+                  <td>{{ f.order_amount|default:"0"|floatformat:2|intcomma }}</td>
+                  <td>{{ f.reason_no_order|default:"N/A" }}</td>
+                  <td>
+                    {% if f.is_payment_collected %}
+                      ✅ Yes
+                    {% else %}
+                      ❌ No
+                    {% endif %}
+                  </td>
+                  <td>{{ f.payment_amount|default:"0"|floatformat:2|intcomma }}</td>
+                  <td>{{ f.reason_no_payment|default:"N/A" }}</td>
+                  <td>{{ f.created_at|date:"Y-m-d H:i" }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- 🔀 Pagination -->
+          <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+              {% if followups.has_previous %}
+                <li class="page-item">
+                  <a class="page-link" href="?page=1{% if created_date %}&created_date={{ created_date }}{% endif %}">« First</a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ followups.previous_page_number }}{% if created_date %}&created_date={{ created_date }}{% endif %}">‹ Prev</a>
+                </li>
+              {% endif %}
+
+              <li class="page-item active">
+                <span class="page-link">
+                  Page {{ followups.number }} of {{ followups.paginator.num_pages }}
+                </span>
+              </li>
+
+              {% if followups.has_next %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ followups.next_page_number }}{% if created_date %}&created_date={{ created_date }}{% endif %}">Next ›</a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ followups.paginator.num_pages }}{% if created_date %}&created_date={{ created_date }}{% endif %}">Last »</a>
+                </li>
+              {% endif %}
+            </ul>
+          </nav>
+
+          {% else %}
+            <p>No follow-ups found.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    .custom-table td, .custom-table th {
+      white-space: nowrap;
+      vertical-align: middle;
+      padding: 8px 12px;
+    }
+    .custom-table thead th {
+      background: none !important;
+      font-weight: 600;
+      border-bottom: 2px solid #ccc;
+    }
+    .custom-table tbody tr {
+      background: none !important;
+    }
+  </style>
+{% endblock %}

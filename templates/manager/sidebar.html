@@ -1,0 +1,120 @@
+{% load static %}
+
+<div class="sidebar" data-background-color="dark">
+  <div class="sidebar-logo">
+    <!-- Logo Header -->
+    <div class="logo-header" data-background-color="dark">
+      <a href="" class="logo">
+        <img src="{% static 'assets/img/ando.svg' %}" alt="navbar brand" class="navbar-brand" height="20" />
+      </a>
+      <div class="nav-toggle">
+        <button class="btn btn-toggle toggle-sidebar">
+          <i class="gg-menu-right"></i>
+        </button>
+        <button class="btn btn-toggle sidenav-toggler">
+          <i class="gg-menu-left"></i>
+        </button>
+      </div>
+      <button class="topbar-toggler more">
+        <i class="gg-more-vertical-alt"></i>
+      </button>
+    </div>
+    <!-- End Logo Header -->
+  </div>
+
+  <div class="sidebar-wrapper scrollbar scrollbar-inner">
+    <div class="sidebar-content">
+      <ul class="nav nav-secondary">
+
+        <!-- Dashboard -->
+        <li class="nav-item active">
+          <a data-bs-toggle="collapse" href="#dashboard" class="collapsed" aria-expanded="false">
+            <i class="fas fa-home"></i>
+            <p>Dashboard</p>
+            <span class="caret"></span>
+          </a>
+          <div class="collapse" id="dashboard">
+            <ul class="nav nav-collapse">
+              <li><a href="{%url 'index'%}"><span class="sub-item">Dashboard</span></a></li>
+            </ul>
+          </div>
+        </li>
+
+        <!-- Section -->
+        <li class="nav-section">
+          <span class="sidebar-mini-icon"><i class="fa fa-ellipsis-h"></i></span>
+          <h4 class="text-section">Components</h4>
+        </li>
+
+        <!-- Profile -->
+        <li class="nav-item">
+          <a data-bs-toggle="collapse" href="#profile">
+            <i class="fas fa-user-circle"></i>
+            <p>Manage Accounts</p>
+            <span class="caret"></span>
+          </a>
+          <div class="collapse" id="profile">
+            <ul class="nav nav-collapse">
+              <li><a href="#"><span class="sub-item">Update Profile</span></a></li>
+              <li><a href=""><span class="sub-item">Change Password</span></a></li>
+              <li><a href="{%url 'logout'%}"><span class="sub-item">Logout</span></a></li>
+            </ul>
+          </div>
+        </li>
+
+        <!-- Profile -->
+        <li class="nav-item">
+          <a data-bs-toggle="collapse" href="#profile">
+            <i class="fas fa-user-circle"></i>
+            <p>Visits</p>
+            <span class="caret"></span>
+          </a>
+          <div class="collapse" id="profile">
+            <ul class="nav nav-collapse">
+              <li><a href="{%url 'all_visit_list'%}"><span class="sub-item">New Visit List</span></a></li>
+              <li><a href="{%url 'daily_followup_listing'%}"><span class="sub-item">FollowUp Visit</span></a></li>
+
+            </ul>
+          </div>
+        </li>
+
+        <!-- Visits Achieved -->
+        <li class="nav-item">
+          <a href="{% url 'daily_forms_list'%}">
+            <i class="fas fa-check-circle"></i>
+            <p>New Visitis Forms</p>
+          </a>
+        </li>
+
+        <!-- Visits Achieved -->
+        <li class="nav-item">
+          <a href="{%url 'daily_followups_list'%}">
+            <i class="fas fa-check-circle"></i>
+            <p>Follow Up Forms</p>
+          </a>
+        </li>
+
+   <!-- Visits Achieved -->
+        <li class="nav-item">
+          <a href="{%url 'customer_list'%}">
+            <i class="fas fa-check-circle"></i>
+            <p>Customer Directory</p>
+          </a>
+        </li>
+
+
+
+
+
+        <!-- New Leads -->
+
+
+
+
+
+
+
+      </ul>
+    </div>
+  </div>
+</div>

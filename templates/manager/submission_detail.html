@@ -1,0 +1,115 @@
+{% extends "manager/base.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block content %}
+  {% include "manager/sidebar.html" %}
+  <div class="main-panel">
+    <div class="main-header">
+      {% include "manager/nav.html" %}
+    </div>
+
+    <div class="container">
+      <div class="page-inner">
+        <div class="container mt-4">
+          <h3 class="mb-3">Form Serial Number: {{ form.serial_number }}</h3>
+        
+          <hr>
+          <h4 class="mb-3">Visits ({{ visits.count }})</h4>
+
+          {% if visits %}
+          <div class="table-responsive">
+            <table class="table table-bordered table-striped align-middle w-100 custom-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Production Line</th>
+                  <th>Client / Company</th>
+                  <th>Contact Person</th>
+                  <th>Contact Number</th>
+                  <th>Designation</th>
+                  <th>Location</th>
+                  <th>Meeting Purpose</th>
+                  <th>Outcome</th>
+                  <th>Item Discussed</th>
+                  <th>Order Quoted</th>
+                  <th>Order Amount</th>
+                  <th>Reason (if No Order)</th>
+                  <th>Created At</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for v in visits %}
+                <tr>
+                  <td>{{ forloop.counter }}</td>
+                  <td>{{ v.get_productionline_display }}</td>
+                  <td>{{ v.company_name }}</td>
+                  <td>{{ v.contact_person }}</td>
+                  <td>{{ v.contact_number }}</td>
+                  <td>{{ v.designation }}</td>
+                  <td>
+                    {% if v.latitude and v.longitude %}
+                      📍 {{ v.place_name }}
+                      <small>{{ v.region }} {{ v.zone }} {{ v.nation }}</small><br>
+                      <a href="https://www.google.com/maps/search/?api=1&query={{ v.latitude }},{{ v.longitude }}"
+                         target="_blank" class="ms-1 text-decoration-none">[View on Map]</a>
+                    {% else %}
+                      <span class="text-muted">Not Available</span>
+                    {% endif %}
+                  </td>
+                  <td>{{ v.meeting_purpose }}</td>
+                  <td>{{ v.meeting_outcome }}</td>
+                  <td>{{ v.item_discussed }}</td>
+                  <td>
+                    {% if v.is_order_quoted %}
+                      <span class="badge bg-success">Yes</span>
+                    {% else %}
+                      <span class="badge bg-danger">No</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if v.is_order_quoted and v.order_amount %}
+                      {{ v.order_amount|intcomma }}
+                    {% else %}
+                      N/A
+                    {% endif %}
+                  </td>
+                  <td>{{ v.reason_no_order|default:"N/A" }}</td>
+                  <td>{{ v.created_at }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+            <p>No visits added for this day.</p>
+          {% endif %}
+
+          <a href="{% url 'daily_forms_list' %}" class="btn btn-outline-secondary mt-3">⬅ Back to List</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    /* Ensure rows don't expand in height */
+    .custom-table td, 
+    .custom-table th {
+      white-space: nowrap;   /* Prevent shrinking / wrapping */
+      vertical-align: middle;
+      padding: 8px 12px;     /* Fixed padding */
+    }
+
+    /* Remove background colors from table headers */
+    .custom-table thead th {
+      background: none !important;
+      font-weight: 600;
+      border-bottom: 2px solid #ccc;
+    }
+
+    /* Keep rows clean */
+    .custom-table tbody tr {
+      background: none !important;
+    }
+  </style>
+{% endblock %}

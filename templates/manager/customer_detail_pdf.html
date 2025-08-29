@@ -1,0 +1,228 @@
+{% load humanize %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Customer Detail Report</title>
+  <style>
+    @page {
+      size: A4 landscape;
+      margin: 8mm;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 9pt;
+      color: #111;
+    }
+
+    h3, h4, h5 {
+      margin: 0 0 10px;
+      font-size: 11pt;
+    }
+
+    .section {
+      margin-bottom: 20px;
+    }
+
+    .meta {
+      font-size: 8.5pt;
+      margin-bottom: 10px;
+    }
+
+    .hr {
+      border: none;
+      border-top: 1px solid #ccc;
+      margin: 6px 0 8px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+
+    thead { display: table-header-group; }
+    tr { break-inside: avoid; page-break-inside: avoid; }
+
+    th, td {
+      border: 0.6px solid #444;
+      padding: 4px;
+      font-size: 8pt;
+      vertical-align: top;
+      overflow-wrap: break-word;
+    }
+
+    thead th {
+      background-color: #f1f3f5;
+      font-weight: bold;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 1px 4px;
+      font-size: 7.5pt;
+      font-weight: bold;
+      color: #fff;
+      border-radius: 3px;
+    }
+
+    .bg-success { background-color: #28a745; }
+    .bg-danger  { background-color: #dc3545; }
+
+    /* Column widths */
+    colgroup col:nth-child(1)  { width: 4%; }
+    colgroup col:nth-child(2)  { width: 13%; }
+    colgroup col:nth-child(3)  { width: 13%; }
+    colgroup col:nth-child(4)  { width: 10%; }
+    colgroup col:nth-child(5)  { width: 12%; }
+    colgroup col:nth-child(6)  { width: 10%; }
+    colgroup col:nth-child(7)  { width: 12%; }
+    colgroup col:nth-child(8)  { width: 12%; }
+    colgroup col:nth-child(9)  { width: 14%; }
+
+    @media print {
+      body {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<h3>Customer Detail – {{ customer.company_name }}</h3>
+
+<div class="section meta">
+  <strong>Email:</strong> {{ customer.email }}<br>
+  <strong>Designation:</strong> {{ customer.designation }}<br>
+  <strong>Location:</strong> {{ customer.location }}
+</div>
+
+<div class="section">
+  <h4>Contact People</h4>
+  {% if contacts %}
+    <ul>
+      {% for contact in contacts %}
+        <li>{{ contact.contact_name }} – {{ contact.contact_detail }}</li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No contacts found.</p>
+  {% endif %}
+</div>
+
+<div class="section">
+  <h4>Quoted Orders from New Visits</h4>
+  {% if quoted_visits %}
+  <table>
+    <colgroup>
+      <col><col><col><col><col>
+    </colgroup>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Production Line</th>
+        <th>Contact Person</th>
+        <th>Order Amount</th>
+        <th>Visit Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for visit in quoted_visits %}
+      <tr>
+        <td>{{ forloop.counter }}</td>
+        <td>{{ visit.get_productionline_display }}</td>
+        <td>{{ visit.contact_person.contact_name|default:"-" }}</td>
+        <td>{{ visit.order_amount|floatformat:2|intcomma }}</td>
+        <td>{{ visit.created_at }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+    <tfoot>
+      <tr>
+        <td colspan="3"><strong>Total</strong></td>
+        <td colspan="2"><strong>{{ quoted_visits_total|floatformat:2|intcomma }}</strong></td>
+      </tr>
+    </tfoot>
+  </table>
+  {% else %}
+    <p>No quoted orders from visits.</p>
+  {% endif %}
+</div>
+
+<div class="section">
+  <h4>Follow-ups (Orders & Payments)</h4>
+  {% if followups %}
+  <table>
+    <colgroup>
+      <col><col><col><col><col><col><col><col><col>
+    </colgroup>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Production Line</th>
+        <th>Order Quoted</th>
+        <th>Order Amount</th>
+        <th>Payment Collected</th>
+        <th>Payment Amount</th>
+        <th>Reason (No Order)</th>
+        <th>Contact Person</th>
+        <th>Created At</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for f in followups %}
+      <tr>
+        <td>{{ forloop.counter }}</td>
+        <td>{{ f.get_productionline_display }}</td>
+        <td>
+          {% if f.is_order_quoted %}
+            <span class="badge bg-success">✔</span>
+          {% else %}
+            <span class="badge bg-danger">✖</span>
+          {% endif %}
+        </td>
+        <td>
+          {% if f.is_order_quoted %}
+            {{ f.order_amount|floatformat:2|intcomma }}
+          {% else %}
+            N/A
+          {% endif %}
+        </td>
+        <td>
+          {% if f.is_payment_collected %}
+            <span class="badge bg-success">✔</span>
+          {% else %}
+            <span class="badge bg-danger">✖</span>
+          {% endif %}
+        </td>
+        <td>
+          {% if f.is_payment_collected %}
+            {{ f.payment_amount|floatformat:2|intcomma }}
+          {% else %}
+            N/A
+          {% endif %}
+        </td>
+        <td>{{ f.reason_no_order|default:"N/A" }}</td>
+        <td>{{ f.contact_person.contact_name|default:"-" }}</td>
+        <td>{{ f.created_at }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+    <tfoot>
+      <tr>
+        <td colspan="3"><strong>Totals</strong></td>
+        <td><strong>{{ followup_order_total|floatformat:2|intcomma }}</strong></td>
+        <td colspan="2"><strong>{{ followup_payment_total|floatformat:2|intcomma }}</strong></td>
+        <td colspan="3"></td>
+      </tr>
+    </tfoot>
+  </table>
+  {% else %}
+    <p>No follow-up records available.</p>
+  {% endif %}
+</div>
+
+</body>
+</html>
