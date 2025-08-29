@@ -20,29 +20,29 @@
           {% csrf_token %}
 
           <!-- STEP 1 -->
-          <div class="step" id="step-1">
-            <h5>Step 1: Client & Meeting Info</h5>
-            <div class="row">
-              <div class="col-md-6 mb-3">{{ form.productionline.label_tag }} {{ form.productionline }}</div>
-              <div class="col-md-6 mb-3">{{ form.designation.label_tag }} {{ form.designation }}</div>
-            </div>
-            <div class="row">
-              <div class="col-md-6 mb-3">{{ form.company_name.label_tag }} {{ form.company_name }}</div>
-              <div class="col-md-6 mb-3">{{ form.contact_person.label_tag }} {{ form.contact_person }}</div>
-            </div>
-            <div class="row">
-              <div class="col-md-6 mb-3">{{ form.contact_number.label_tag }} {{ form.contact_number }}</div>
-              <div class="col-md-6 mb-3">{{ form.meeting_purpose.label_tag }} {{ form.meeting_purpose }}</div>
-            </div>
+<div class="step" id="step-1">
+  <h5>Step 1: Client & Meeting Info</h5>
+  <div class="row">
+    <div class="col-md-6 mb-3">{{ form.productionline.label_tag }} {{ form.productionline }}</div>
+    <div class="col-md-6 mb-3">{{ form.company_name.label_tag }} {{ form.company_name }}</div>
+  </div>
+  <div class="row">
+    <div class="col-md-6 mb-3">{{ form.contact_person.label_tag }} {{ form.contact_person }}</div>
+    <div class="col-md-6 mb-3">{{ form.contact_number.label_tag }} {{ form.contact_number }}</div>
+  </div>
+  <div class="row">
+    <div class="col-md-6 mb-3">{{ form.designation.label_tag }} {{ form.designation }}</div>
+    <div class="col-md-6 mb-3">{{ form.meeting_purpose.label_tag }} {{ form.meeting_purpose }}</div>
+  </div>
 
-            <!-- Map -->
-            {{ form.latitude }} {{ form.longitude }}
-            <label class="form-label">Pin Location</label>
-            <div id="map" style="height:350px; width:100%;" class="mb-2 border"></div>
-            <div id="location-details" class="p-2 border rounded small text-muted">Please allow location access…</div>
+  <!-- Map -->
+  {{ form.latitude }} {{ form.longitude }}
+  <label class="form-label">Pin Location</label>
+  <div id="map" style="height:350px; width:100%;" class="mb-2 border"></div>
+  <div id="location-details" class="p-2 border rounded small text-muted">Please allow location access…</div>
 
-            <button type="button" class="btn btn-primary mt-3 next-step">Next</button>
-          </div>
+  <button type="button" class="btn btn-primary mt-3 next-step">Next</button>
+</div>
 
           <!-- STEP 2 -->
           <div class="step d-none" id="step-2">
@@ -93,9 +93,104 @@
 
   <!-- Styles same as new_visit -->
   <style>
-    form input, form select, form textarea { background: transparent !important; }
-    #map { border-radius: 6px; }
-  </style>
+  /* Panel & container */
+  .main-panel {
+    margin-left: 220px;
+  }
+  .page-inner {
+    padding: 20px !important;
+  }
+
+  /* Headings */
+  h1, h5 {
+    font-weight: 600;
+    color: #222;
+  }
+
+  /* Inputs, selects, textarea (Bootstrap override) */
+  form input,
+  form select,
+  form textarea,
+  .form-control {
+    width: 100%;
+    background: transparent !important;   /* ✅ no white background */
+    border: 1px solid #ccc !important;
+    border-radius: 6px !important;
+    padding: 10px !important;
+    font-size: 0.95rem !important;
+    color: #222 !important;
+    box-shadow: none !important;
+    transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+  }
+
+  /* Hover effect */
+  form input:hover,
+  form select:hover,
+  form textarea:hover,
+  .form-control:hover {
+    background-color: rgba(0,0,0,0.03) !important;  /* light gray hint */
+  }
+
+  /* Focus state */
+  form input:focus,
+  form select:focus,
+  form textarea:focus,
+  .form-control:focus {
+    border-color: #007bff !important;
+    outline: none !important;
+    background: transparent !important;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,.15) !important;
+  }
+
+  /* Placeholder style */
+  ::placeholder {
+    color: #888 !important;
+    opacity: 1;
+  }
+
+  /* Select placeholder */
+  select option:first-child {
+    color: #888;
+  }
+
+  /* Buttons */
+  .btn {
+    border-radius: 6px;
+    font-weight: 500;
+    padding: 10px 18px;
+  }
+
+  /* Map & location details */
+  #map {
+    border: 1px solid #ccc;
+    border-radius: 6px;
+  }
+  #location-details {
+    background: #fafafa;
+  }
+
+  /* Responsive layout */
+  @media (max-width: 768px) {
+    .main-panel {
+      margin-left: 0;
+    }
+    h1 {
+      font-size: 1.4rem;
+    }
+    h5 {
+      font-size: 1.1rem;
+    }
+    .btn {
+      font-size: 0.9rem;
+      padding: 8px 14px;
+    }
+    .row > [class*="col-"] {
+      flex: 0 0 100%;
+      max-width: 100%;
+    }
+  }
+</style>
+
 
   <!-- Leaflet -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>

@@ -1,23 +1,15 @@
 {% load static %}
 
-<nav class="navbar navbar-header navbar-header-transparent navbar-expand-lg border-bottom">
+<nav class="navbar navbar-header navbar-expand-lg border-bottom" style="background-color: rgb(11, 139, 139)">
   <div class="container-fluid">
-    <nav class="navbar navbar-header-left navbar-expand-lg navbar-form nav-search p-0 d-none d-lg-flex">
-      <div class="input-group">
-        <div class="input-group-prepend">
-          <button type="submit" class="btn btn-search pe-1">
-            <i class="fa fa-search search-icon"></i>
-          </button>
-        </div>
-        <input type="text" placeholder="Search ..." class="form-control" />
-      </div>
-    </nav>
+
+    <!-- Removed search bar -->
 
     <ul class="navbar-nav topbar-nav ms-md-auto align-items-center">
 
       <!-- Notifications -->
       <li class="nav-item topbar-icon dropdown hidden-caret">
-        <a class="nav-link dropdown-toggle" href="#" id="notifDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <a class="nav-link dropdown-toggle text-white" href="#" id="notifDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           <i class="fa fa-bell"></i>
           <span class="notification">4</span>
         </a>
@@ -26,7 +18,7 @@
           <li>
             <div class="notif-scroll scrollbar-outer">
               <div class="notif-center">
-                <!-- Your notification content here -->
+                <!-- Notification items here -->
               </div>
             </div>
           </li>
@@ -36,9 +28,9 @@
 
       <!-- User Dropdown -->
       <li class="nav-item topbar-user dropdown hidden-caret">
-        <a class="dropdown-toggle profile-pic" data-bs-toggle="dropdown" href="#" aria-expanded="false">
+        <a class="dropdown-toggle profile-pic text-white" data-bs-toggle="dropdown" href="#" aria-expanded="false">
           <div class="avatar-sm">
-            <div class="avatar-initial rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; font-size: 18px;">
+            <div class="avatar-initial rounded-circle bg-light text-primary d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; font-size: 18px;">
               {% if request.user.is_authenticated %}
                 {{ request.user.first_name|slice:":1"|default:"U"|upper }}
               {% else %}

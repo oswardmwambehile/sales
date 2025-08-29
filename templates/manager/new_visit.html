@@ -21,52 +21,53 @@
           {% csrf_token %}
 
           <!-- Step 1 -->
-          <div class="step" id="step-1">
-            <h5 class="mb-3">Step 1: Client & Meeting Info</h5>
+<div class="step" id="step-1">
+  <h5 class="mb-3">Step 1: Client & Meeting Info</h5>
 
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                {{ form.productionline.label_tag }}
-                {{ form.productionline }}
-                <div class="text-danger small">{{ form.productionline.errors|default:"" }}</div>
-              </div>
+  <div class="row">
+    <div class="col-md-6 mb-3">
+      {{ form.productionline.label_tag }}
+      {{ form.productionline }}
+      <div class="text-danger small">{{ form.productionline.errors|default:"" }}</div>
+    </div>
 
-              <div class="col-md-6 mb-3">
-                {{ form.designation.label_tag }}
-                {{ form.designation }}
-              </div>
-            </div>
+    <div class="col-md-6 mb-3">
+      {{ form.company_name.label_tag }}
+      {{ form.company_name }}
+    </div>
+  </div>
 
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                {{ form.company_name.label_tag }}
-                {{ form.company_name }}
-              </div>
-              <div class="col-md-6 mb-3">
-                {{ form.contact_person.label_tag }}
-                {{ form.contact_person }}
-              </div>
-            </div>
+  <div class="row">
+    <div class="col-md-6 mb-3">
+      {{ form.contact_person.label_tag }}
+      {{ form.contact_person }}
+    </div>
+    <div class="col-md-6 mb-3">
+      {{ form.contact_number.label_tag }}
+      {{ form.contact_number }}
+    </div>
+  </div>
 
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                {{ form.contact_number.label_tag }}
-                {{ form.contact_number }}
-              </div>
-              <div class="col-md-6 mb-3">
-                {{ form.meeting_purpose.label_tag }}
-                {{ form.meeting_purpose }}
-              </div>
-            </div>
+  <div class="row">
+    <div class="col-md-6 mb-3">
+      {{ form.designation.label_tag }}
+      {{ form.designation }}
+    </div>
+    <div class="col-md-6 mb-3">
+      {{ form.meeting_purpose.label_tag }}
+      {{ form.meeting_purpose }}
+    </div>
+  </div>
 
-            <!-- Map -->
-            {{ form.latitude }} {{ form.longitude }}
-            <label class="form-label">Pin Location</label>
-            <div id="map" style="height:350px; width:100%;" class="mb-2 border"></div>
-            <div id="location-details" class="p-2 border rounded small text-muted">Please allow location access…</div>
+  <!-- Map -->
+  {{ form.latitude }} {{ form.longitude }}
+  <label class="form-label">Pin Location</label>
+  <div id="map" style="height:350px; width:100%;" class="mb-2 border"></div>
+  <div id="location-details" class="p-2 border rounded small text-muted">Please allow location access…</div>
 
-            <button type="button" class="btn btn-primary mt-3 next-step">Next</button>
-          </div>
+  <button type="button" class="btn btn-primary mt-3 next-step">Next</button>
+</div>
+
 
           <!-- Step 2 (merged Step 2 + Step 3) -->
           <div class="step d-none" id="step-2">
