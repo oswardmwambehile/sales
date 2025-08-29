@@ -140,7 +140,7 @@
         <td>
           {% if v.is_order_quoted %}
             {{ v.order_amount|default:"0"|floatformat:2|intcomma }}
-          {% else %}-{% endif %}
+          {% else %}N/A{% endif %}
         </td>
         <td>{{ v.reason_no_order|default:"N/A" }}</td>
       </tr>

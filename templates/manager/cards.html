@@ -1,6 +1,6 @@
 <div class="row">
-  <!-- Existing 4 Cards -->
-  <!-- Card 1 -->
+
+  <!-- Card 1: Total New Visits -->
   <div class="col-sm-6 col-md-3">
     <div class="card card-stats card-round">
       <div class="card-body">
@@ -12,8 +12,8 @@
           </div>
           <div class="col col-stats ms-3 ms-sm-0">
             <div class="numbers">
-              <p class="card-category">Visits Achieved</p>
-              <h4 class="card-title">1,294</h4>
+              <p class="card-category">Total New Visits</p>
+              <h4 class="card-title">{{ total_new_visits|default:0 }}</h4>
             </div>
           </div>
         </div>
@@ -21,7 +21,7 @@
     </div>
   </div>
 
-  <!-- Card 2 -->
+  <!-- Card 2: Total Followup Visits -->
   <div class="col-sm-6 col-md-3">
     <div class="card card-stats card-round">
       <div class="card-body">
@@ -33,8 +33,8 @@
           </div>
           <div class="col col-stats ms-3 ms-sm-0">
             <div class="numbers">
-              <p class="card-category">Payment Collected</p>
-              <h4 class="card-title">1,303</h4>
+              <p class="card-category">Total Followup Visits</p>
+              <h4 class="card-title">{{ total_followups|default:0 }}</h4>
             </div>
           </div>
         </div>
@@ -42,7 +42,7 @@
     </div>
   </div>
 
-  <!-- Card 3 -->
+  <!-- Card 3: Order For New Visit -->
   <div class="col-sm-6 col-md-3">
     <div class="card card-stats card-round">
       <div class="card-body">
@@ -54,8 +54,8 @@
           </div>
           <div class="col col-stats ms-3 ms-sm-0">
             <div class="numbers">
-              <p class="card-category">New Order Quoted</p>
-              <h4 class="card-title">$1,345</h4>
+              <p class="card-category">Order For New Visit</p>
+              <h4 class="card-title">{{ order_new_visit|default:0 }}</h4>
             </div>
           </div>
         </div>
@@ -63,7 +63,7 @@
     </div>
   </div>
 
-  <!-- Card 4 -->
+  <!-- Card 4: Customer Available -->
   <div class="col-sm-6 col-md-3">
     <div class="card card-stats card-round">
       <div class="card-body">
@@ -75,8 +75,8 @@
           </div>
           <div class="col col-stats ms-3 ms-sm-0">
             <div class="numbers">
-              <p class="card-category">Users Available</p>
-              <h4 class="card-title">576</h4>
+              <p class="card-category">Customer Available</p>
+              <h4 class="card-title">{{ customer_available|default:0 }}</h4>
             </div>
           </div>
         </div>
@@ -84,7 +84,7 @@
     </div>
   </div>
 
-  <!-- ✅ New Card 1: Route Client List -->
+  <!-- Card 5: Order For FollowUp -->
   <div class="col-sm-6 col-md-3">
     <div class="card card-stats card-round">
       <div class="card-body">
@@ -96,8 +96,8 @@
           </div>
           <div class="col col-stats ms-3 ms-sm-0">
             <div class="numbers">
-              <p class="card-category">Route Client List</p>
-              <h4 class="card-title">42 Clients</h4>
+              <p class="card-category">Order For FollowUp</p>
+              <h4 class="card-title">{{ order_followups|default:0 }}</h4>
             </div>
           </div>
         </div>
@@ -105,7 +105,7 @@
     </div>
   </div>
 
-  <!-- ✅ New Card 2: Production Line -->
+  <!-- Card 6: Payment Collected For FollowUp -->
   <div class="col-sm-6 col-md-3">
     <div class="card card-stats card-round">
       <div class="card-body">
@@ -117,8 +117,8 @@
           </div>
           <div class="col col-stats ms-3 ms-sm-0">
             <div class="numbers">
-              <p class="card-category">Production Line</p>
-              <h4 class="card-title">Active</h4>
+              <p class="card-category">Payment Collected For FollowUp</p>
+              <h4 class="card-title">{{ payment_collected|default:0 }}</h4>
             </div>
           </div>
         </div>
@@ -126,7 +126,7 @@
     </div>
   </div>
 
-  <!-- ✅ New Card 3: Routes -->
+  <!-- Card 7: Order Quoted For New Visit -->
   <div class="col-sm-6 col-md-3">
     <div class="card card-stats card-round">
       <div class="card-body">
@@ -138,8 +138,8 @@
           </div>
           <div class="col col-stats ms-3 ms-sm-0">
             <div class="numbers">
-              <p class="card-category">Routes</p>
-              <h4 class="card-title">23 Total</h4>
+              <p class="card-category">Order Quoted For New Visit</p>
+              <h4 class="card-title">{{ quoted_new_visits|default:0 }}</h4>
             </div>
           </div>
         </div>
@@ -147,7 +147,7 @@
     </div>
   </div>
 
-  <!-- ✅ New Card 4: New Leads -->
+  <!-- Card 8: New Leads -->
   <div class="col-sm-6 col-md-3">
     <div class="card card-stats card-round">
       <div class="card-body">
@@ -160,11 +160,12 @@
           <div class="col col-stats ms-3 ms-sm-0">
             <div class="numbers">
               <p class="card-category">New Leads</p>
-              <h4 class="card-title">18 This Week</h4>
+              <h4 class="card-title">{{ new_leads|default:0 }}</h4>
             </div>
           </div>
         </div>
       </div>
     </div>
   </div>
+
 </div>

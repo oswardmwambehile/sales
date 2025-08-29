@@ -19,7 +19,7 @@ urlpatterns = [
         name="daily_followup_detail"
     ),
     path("daily-followups/pdf/", views.export_followups_pdf, name="export_followups_pdf"),
-
+     path('change-password/', views.change_password, name='change_password'),
     path("get-contacts/<int:company_id>/", views.get_contacts, name="get_contacts"),
     path("get-contact-details/<int:contact_id>/", views.get_contact_details, name="get_contact_details"),
      path("daily-followups_listing/", views.daily_followup_listing, name="daily_followup_listing"),  # n

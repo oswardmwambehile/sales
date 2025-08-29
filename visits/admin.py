@@ -89,89 +89,108 @@ class CustomUserAdmin(BaseUserAdmin):
 admin.site.register(CustomUser, CustomUserAdmin)
 
 
-# --- NewVisit Admin ---
+
+
+from django.contrib import admin
+from .models import DailyFollowUp, FollowUp, FollowUpSubmission
+
+
+# 🔹 Inline FollowUps under DailyFollowUp
+class FollowUpInline(admin.TabularInline):  # or StackedInline for more spacing
+    model = FollowUp
+    extra = 0
+    fields = (
+        'productionline',
+        'company_name',
+        'contact_person',
+        'meeting_purpose',
+        'meeting_outcome',
+        'is_order_quoted',
+        'order_amount',
+        'is_payment_collected',
+        'payment_amount',
+    )
+    readonly_fields = ('created_at', 'updated_at')
+
+
+# 🔹 Admin for DailyFollowUp
+@admin.register(DailyFollowUp)
+class DailyFollowUpAdmin(admin.ModelAdmin):
+    list_display = ('serial_number', 'user', 'date', 'created_at')
+    list_filter = ('date', 'user')
+    search_fields = ('serial_number', 'user__email')
+    inlines = [FollowUpInline]
+    ordering = ('-date',)
+
+
+# 🔹 Admin for FollowUp
+@admin.register(FollowUp)
+class FollowUpAdmin(admin.ModelAdmin):
+    list_display = (
+        'company_name', 'contact_person', 'productionline',
+        'is_order_quoted', 'order_amount',
+        'is_payment_collected', 'payment_amount',
+        'created_at',
+    )
+    list_filter = (
+        'productionline', 'is_order_quoted', 'is_payment_collected', 'created_at'
+    )
+    search_fields = ('company_name__company_name', 'contact_person__contact_name')
+    date_hierarchy = 'created_at'
+    readonly_fields = ('created_at', 'updated_at')
+
+    fieldsets = (
+        ('Basic Info', {
+            'fields': ('daily_followup', 'productionline', 'company_name', 'contact_person')
+        }),
+        ('Contact Snapshot', {
+            'fields': ('contact_number', 'designation', 'latitude', 'longitude')
+        }),
+        ('Meeting Details', {
+            'fields': ('meeting_purpose', 'meeting_outcome', 'item_discussed')
+        }),
+        ('Order Info', {
+            'fields': ('is_order_quoted', 'order_amount', 'reason_no_order')
+        }),
+        ('Payment Info', {
+            'fields': ('is_payment_collected', 'payment_amount', 'reason_no_payment')
+        }),
+        ('Meta', {
+            'fields': ('added_by', 'created_at', 'updated_at')
+        }),
+    )
+
+
+# 🔹 Admin for FollowUpSubmission
+@admin.register(FollowUpSubmission)
+class FollowUpSubmissionAdmin(admin.ModelAdmin):
+    list_display = ('daily_followup', 'user', 'final_status')
+    list_filter = ('final_status',)
+    search_fields = ('user__email', 'daily_followup__serial_number')
+
+
+from django.contrib import admin
+from .models import DailyVisitForm, NewVisit, FormSubmission
+
+
+@admin.register(DailyVisitForm)
+class DailyVisitFormAdmin(admin.ModelAdmin):
+    list_display = ('serial_number', 'user', 'date', 'created_at')
+    list_filter = ('date',)
+    search_fields = ('user__email', 'serial_number')
+
+
 @admin.register(NewVisit)
 class NewVisitAdmin(admin.ModelAdmin):
-    # Columns in list view
-    list_display = (
-        "id", "client_name_or_company", "contact_person", "contact_number",
-        "designation", "productionline", "meeting_purpose",
-        "meeting_outcome", "is_order_quoted", "order_amount",
-        "added_by", "created_at"
-    )
-    list_display_links = ("id", "client_name_or_company")
+    list_display = ('company_name', 'contact_person', 'productionline', 'is_order_quoted', 'order_amount', 'created_at')
+    list_filter = ('productionline', 'is_order_quoted', 'created_at')
+    search_fields = ('company_name__company_name', 'contact_person__contact_name', 'meeting_purpose', 'meeting_outcome')
 
-    # Filters on the right
-    list_filter = ("productionline", "designation", "is_order_quoted", "created_at")
 
-    # Search bar
-    search_fields = (
-        "company_name__company_name",       # ✅ related Customer
-        "contact_person__contact_name",     # ✅ related Contact
-        "contact_number", "meeting_purpose",
-        "meeting_outcome", "item_discussed"
-    )
+@admin.register(FormSubmission)
+class FormSubmissionAdmin(admin.ModelAdmin):
+    list_display = ('user', 'daily_form', 'final_status', 'created_at')
+    list_filter = ('final_status', 'created_at')
+    search_fields = ('user__email',)
 
-    # Fields you cannot edit
-    readonly_fields = ("created_at", "updated_at", "added_by", "location_preview")
 
-    # Form layout
-    fieldsets = (
-        ("Client Information", {
-            "fields": ("company_name", "contact_person", "contact_number", "designation")
-        }),
-        ("Production Line", {
-            "fields": ("productionline",)
-        }),
-        ("Meeting Details", {
-            "fields": ("meeting_purpose", "meeting_outcome", "item_discussed")
-        }),
-        ("Order Details", {
-            "fields": ("is_order_quoted", "order_amount", "reason_no_order")
-        }),
-        ("Location", {
-            "fields": ("latitude", "longitude", "location_preview"),
-        }),
-        ("Tracking", {
-            "fields": ("added_by", "created_at", "updated_at"),
-        }),
-    )
-
-    # Save user automatically
-    def save_model(self, request, obj, form, change):
-        if not obj.added_by:
-            obj.added_by = request.user
-        super().save_model(request, obj, form, change)
-
-    # Show Google Maps preview inside admin
-    def location_preview(self, obj):
-        if obj.latitude and obj.longitude:
-            return mark_safe(
-                f'<a href="https://www.google.com/maps?q={obj.latitude},{obj.longitude}" target="_blank">'
-                f"View on Map ({obj.latitude}, {obj.longitude})</a>"
-            )
-        return "No location set"
-    location_preview.short_description = "Map Location"
-
-    # ✅ Custom method for list_display
-    def client_name_or_company(self, obj):
-        return obj.company_name.company_name if obj.company_name else "—"
-    client_name_or_company.short_description = "Company / Client"
-
-    # Custom admin action: Export selected to CSV
-    actions = ["export_as_csv"]
-
-    def export_as_csv(self, request, queryset):
-        meta = self.model._meta
-        field_names = [field.name for field in meta.fields]
-
-        response = HttpResponse(content_type="text/csv")
-        response["Content-Disposition"] = f'attachment; filename={meta.model_name}.csv'
-        writer = csv.writer(response)
-
-        writer.writerow(field_names)
-        for obj in queryset:
-            writer.writerow([getattr(obj, field) for field in field_names])
-        return response
-
-    export_as_csv.short_description = "Export Selected to CSV"

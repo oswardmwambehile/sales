@@ -6,9 +6,7 @@ from django.shortcuts import get_object_or_404
 
 from django.shortcuts import render, get_object_or_404, redirect
 from django.shortcuts import render, get_object_or_404, redirect
-# Create your views here.
-def index(request):
-    return render(request, 'manager/index.html')
+
 
 
 def add_visit(request):
@@ -893,3 +891,62 @@ def export_followups_pdf(request):
     response = HttpResponse(result.getvalue(), content_type="application/pdf")
     response["Content-Disposition"] = f'attachment; filename="{filename}"'
     return response
+
+
+
+from django.contrib.auth import authenticate, update_session_auth_hash
+
+
+
+def change_password(request):
+    if request.method == 'POST':
+        current_password = request.POST.get('current_password')
+        new_password1 = request.POST.get('new_password1')
+        new_password2 = request.POST.get('new_password2')
+
+        if not request.user.check_password(current_password):
+            messages.error(request, 'Current password is incorrect.')
+        elif new_password1 != new_password2:
+            messages.error(request, 'New passwords do not match.')
+        elif len(new_password1) < 8:
+            messages.error(request, 'New password must be at least 8 characters.')
+        else:
+            request.user.set_password(new_password1)
+            request.user.save()
+            update_session_auth_hash(request, request.user)  # keep user logged in
+            messages.success(request, 'Password changed successfully.')
+            return redirect('change_password')
+
+    return render(request, 'manager/change_password.html')
+
+from visits.models import NewVisit, FollowUp
+from customer.models import *
+
+def index(request):
+    user = request.user
+
+    # Use added_by, not daily_form__user or daily_followup__user
+    total_new_visits = NewVisit.objects.filter(added_by=user).count()
+    total_followups = FollowUp.objects.filter(added_by=user).count()
+
+    order_new_visit = NewVisit.objects.filter(added_by=user, is_order_quoted=True).count()
+    customer_available = Customer.objects.all().count()
+
+    order_followups = FollowUp.objects.filter(added_by=user, is_order_quoted=True).count()
+    payment_collected = FollowUp.objects.filter(added_by=user, is_payment_collected=True).count()
+
+    quoted_new_visits = NewVisit.objects.filter(added_by=user, is_order_quoted=True).count()
+    
+
+    context = {
+        "total_new_visits": total_new_visits,
+        "total_followups": total_followups,
+        "order_new_visit": order_new_visit,
+        "customer_available": customer_available,
+        "order_followups": order_followups,
+        "payment_collected": payment_collected,
+        "quoted_new_visits": quoted_new_visits,
+        
+    }
+
+    return render(request, "manager/index.html", context)

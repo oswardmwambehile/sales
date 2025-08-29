@@ -189,8 +189,9 @@ class NewVisit(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Visit: {self.company.company_name} - {self.contact.contact_name}"
-
+            company = self.company_name.company_name if self.company_name else "No Company"
+            contact = self.contact_person.contact_name if self.contact_person else "No Contact"
+            return f"Visit: {company} - {contact}"
 # -------------------
 # Form Submission Workflow
 # -------------------
@@ -219,6 +220,7 @@ class FormSubmission(models.Model):
     )
 
     final_status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='opened')
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True,)
 
 
 
