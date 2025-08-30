@@ -337,8 +337,6 @@ def register(request):
 
     return render(request, 'auth/register.html')
 
-
-
 def logout_user(request):
     if request.user.is_authenticated:
         logout(request)
