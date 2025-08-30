@@ -18,6 +18,7 @@ urlpatterns = [
         views.daily_followup_detail,
         name="daily_followup_detail"
     ),
+    path('profile/', views.profile_view, name='profile'),
     path("daily-followups/pdf/", views.export_followups_pdf, name="export_followups_pdf"),
      path('change-password/', views.change_password, name='change_password'),
     path("get-contacts/<int:company_id>/", views.get_contacts, name="get_contacts"),

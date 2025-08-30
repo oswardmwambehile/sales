@@ -1,0 +1,70 @@
+{% extends "manager/base.html" %}
+{% load static %}
+
+{% block content %}
+  {% include "manager/sidebar.html" %}
+  <div class="main-panel">
+    <div class="main-header">
+      <div class="main-header-logo">
+        <div class="logo-header" data-background-color="dark">
+          <a href="index.html" class="logo">
+            <img
+              src="{% static 'assets/img/kaiadmin/logo_light.svg' %}"
+              alt="navbar brand"
+              class="navbar-brand"
+              height="20"
+            />
+          </a>
+          <div class="nav-toggle">
+            <button class="btn btn-toggle toggle-sidebar"><i class="gg-menu-right"></i></button>
+            <button class="btn btn-toggle sidenav-toggler"><i class="gg-menu-left"></i></button>
+          </div>
+          <button class="topbar-toggler more"><i class="gg-more-vertical-alt"></i></button>
+        </div>
+      </div>
+      {% include "manager/nav.html" %}
+    </div>
+
+    <div class="container">
+      <div class="page-inner">
+        <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row pt-2 pb-4">
+          <div>
+            <!-- Optional header content -->
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h4 class="card-title">My Profile</h4>
+          </div>
+          <div class="card-body">
+            <table class="table table-bordered">
+              <tbody>
+                <tr><th>Email</th><td>{{ user.email }}</td></tr>
+                <tr><th>Full Name</th><td>{{ user.get_full_name }}</td></tr>
+                <tr><th>Position</th><td>{{ user.position }}</td></tr>
+                <tr><th>Zone</th><td>{{ user.zone }}</td></tr>
+                <tr><th>Branch</th><td>{{ user.branch }}</td></tr>
+                <tr><th>Contact</th><td>{{ user.contact }}</td></tr>
+                <tr><th>Date Joined</th><td>{{ user.date_joined }}</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Inject custom background override -->
+  <style>
+    body, .main-panel, .page-inner, .container {
+      background: none !important;
+      background-color: transparent !important;
+    }
+
+    .card {
+      background-color: rgba(255, 255, 255, 0.9); /* slightly transparent white background */
+    }
+  </style>
+{% endblock %}

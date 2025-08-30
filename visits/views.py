@@ -948,3 +948,14 @@ def index(request):
     }
 
     return render(request, "manager/index.html", context)
+
+
+
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
+
+@login_required
+def profile_view(request):
+    user = request.user  # The logged-in user
+    return render(request, 'manager/profile.html', {'user': user})
+
