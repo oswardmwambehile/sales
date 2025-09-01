@@ -920,33 +920,66 @@ def change_password(request):
 from visits.models import NewVisit, FollowUp
 from customer.models import *
 
+from django.shortcuts import render
+from .models import NewVisit, FollowUp
+
+from django.db.models import Sum
+from .models import NewVisit, FollowUp
+
+
+import json
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from django.db.models import Sum
+from .models import NewVisit, FollowUp
+from customer.models import *
+
+@login_required
 def index(request):
     user = request.user
 
-    # Use added_by, not daily_form__user or daily_followup__user
-    total_new_visits = NewVisit.objects.filter(added_by=user).count()
+    # NewVisit stats
+    total_new_visits = Customer.objects.all().count()
+    total_order_quoted_new_visits = NewVisit.objects.filter(added_by=user, is_order_quoted=True).count()
+    total_order_amount_new_visits = NewVisit.objects.filter(
+        added_by=user, is_order_quoted=True
+    ).aggregate(total=Sum('order_amount'))['total'] or 0
+
+    # FollowUp stats
     total_followups = FollowUp.objects.filter(added_by=user).count()
+    total_order_quoted_followups = FollowUp.objects.filter(added_by=user, is_order_quoted=True).count()
+    total_order_amount_followups = FollowUp.objects.filter(
+        added_by=user, is_order_quoted=True
+    ).aggregate(total=Sum('order_amount'))['total'] or 0
 
-    order_new_visit = NewVisit.objects.filter(added_by=user, is_order_quoted=True).count()
-    customer_available = Customer.objects.all().count()
+    total_payment_collected_count = FollowUp.objects.filter(added_by=user, is_payment_collected=True).count()
+    total_payment_collected_amount = FollowUp.objects.filter(
+        added_by=user, is_payment_collected=True
+    ).aggregate(total=Sum('payment_amount'))['total'] or 0
 
-    order_followups = FollowUp.objects.filter(added_by=user, is_order_quoted=True).count()
-    payment_collected = FollowUp.objects.filter(added_by=user, is_payment_collected=True).count()
+    # JSON serialize data for charts
+    doughnut_data = json.dumps([total_new_visits, total_order_quoted_new_visits])
+    doughnut_labels = json.dumps(["New Visits", "Order Quoted (New Visits)"])
 
-    quoted_new_visits = NewVisit.objects.filter(added_by=user, is_order_quoted=True).count()
-    
+    bar_data = json.dumps([total_followups, total_order_quoted_followups, total_payment_collected_count])
+    bar_labels = json.dumps(["Total Follow-Ups", "Order Quoted (Follow-Ups)", "Payments Collected"])
 
     context = {
+        # Cards data (unchanged)
         "total_new_visits": total_new_visits,
+        "total_order_quoted_new_visits": total_order_quoted_new_visits,
+        "total_order_amount_new_visits": total_order_amount_new_visits,
         "total_followups": total_followups,
-        "order_new_visit": order_new_visit,
-        "customer_available": customer_available,
-        "order_followups": order_followups,
-        "payment_collected": payment_collected,
-        "quoted_new_visits": quoted_new_visits,
-        
-    }
+        "total_order_quoted_followups": total_order_quoted_followups,
+        "total_order_amount_followups": total_order_amount_followups,
+        "total_payment_collected": total_payment_collected_amount,
 
+        # Chart data
+        "doughnut_data": doughnut_data,
+        "doughnut_labels": doughnut_labels,
+        "bar_data": bar_data,
+        "bar_labels": bar_labels,
+    }
     return render(request, "manager/index.html", context)
 
 

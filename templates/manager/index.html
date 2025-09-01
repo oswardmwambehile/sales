@@ -8,12 +8,7 @@
       <div class="main-header-logo">
         <div class="logo-header" data-background-color="dark">
           <a href="index.html" class="logo">
-            <img
-              src="{% static 'assets/img/kaiadmin/logo_light.svg' %}"
-              alt="navbar brand"
-              class="navbar-brand"
-              height="20"
-            />
+            <img src="{% static 'assets/img/kaiadmin/logo_light.svg' %}" alt="navbar brand" class="navbar-brand" height="20" />
           </a>
           <div class="nav-toggle">
             <button class="btn btn-toggle toggle-sidebar"><i class="gg-menu-right"></i></button>
@@ -29,9 +24,8 @@
       <div class="page-inner">
         <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row pt-2 pb-4">
           <div>
-            
+            <!-- Optional content -->
           </div>
-          
         </div>
 
         <!-- Stats -->
@@ -44,50 +38,3 @@
   </div>
 {% endblock %}
 
-
-{% block scripts %}
-<script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const doughnutCanvas = document.getElementById("doughnutChart");
-    const barCanvas = document.getElementById("barChart");
-
-    if (doughnutCanvas) {
-      new Chart(doughnutCanvas, {
-        type: "doughnut",
-        data: {
-          labels: ["Red", "Blue", "Yellow"],
-          datasets: [{
-            label: "Doughnut",
-            data: [200, 150, 100],
-            backgroundColor: ["#f3545d", "#177dff", "#ffa534"]
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false
-        }
-      });
-    }
-
-    if (barCanvas) {
-      new Chart(barCanvas, {
-        type: "bar",
-        data: {
-          labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
-          datasets: [{
-            label: "Subscribers",
-            data: [12, 19, 3, 5, 2, 3],
-            backgroundColor: "#177dff"
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false
-        }
-      });
-    }
-  });
-</script>
-
-
-{% endblock %}

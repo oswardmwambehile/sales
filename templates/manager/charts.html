@@ -1,39 +1,125 @@
+<!-- Chart Containers -->
 <div class="container">
   <div class="page-inner">
     <div class="row">
-      <!-- Doughnut Chart - Left Column -->
+
+      <!-- Doughnut Chart for New Visit Tracking -->
       <div class="col-md-6">
         <div class="card">
-          <div class="card-header">
-            <div class="card-title">Dairly New Visit Tracking</div>
-          </div>
+          <div class="card-header"><div class="card-title">New Visit Overview</div></div>
           <div class="card-body">
-            <div class="chart-container">
-              <canvas
-                id="doughnutChart"
-                style="width: 100%; height: 300px;"
-              ></canvas>
+            <div class="chart-container" style="height: 300px;">
+              <canvas id="doughnutChart"></canvas>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Bar Chart - Right Column -->
+      <!-- Bar Chart for Follow-Up Tracking -->
       <div class="col-md-6">
         <div class="card">
-          <div class="card-header">
-            <div class="card-title">Dairly FollowUp Tracking</div>
-          </div>
+          <div class="card-header"><div class="card-title">Follow-Up Overview</div></div>
           <div class="card-body">
-            <div class="chart-container">
-              <canvas
-                id="barChart"
-                style="width: 100%; height: 300px;"
-              ></canvas>
+            <div class="chart-container" style="height: 300px;">
+              <canvas id="barChart"></canvas>
             </div>
           </div>
         </div>
       </div>
+
     </div>
   </div>
 </div>
+
+{% block scripts %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-notify/0.2.0/js/bootstrap-notify.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const doughnutCanvas = document.getElementById("doughnutChart");
+    const barCanvas = document.getElementById("barChart");
+
+    // Safely parse JSON data from Django context
+    const doughnutData = JSON.parse('{{ doughnut_data|escapejs }}');
+    const doughnutLabels = JSON.parse('{{ doughnut_labels|escapejs }}');
+    const barData = JSON.parse('{{ bar_data|escapejs }}');
+    const barLabels = JSON.parse('{{ bar_labels|escapejs }}');
+
+    console.log("Doughnut Data:", doughnutData);
+    console.log("Doughnut Labels:", doughnutLabels);
+    console.log("Bar Data:", barData);
+    console.log("Bar Labels:", barLabels);
+
+    // ===== Doughnut Chart (New Visits) =====
+    if (doughnutCanvas && Array.isArray(doughnutData)) {
+      new Chart(doughnutCanvas, {
+        type: "doughnut",
+        data: {
+          labels: doughnutLabels,
+          datasets: [{
+            data: doughnutData,
+            backgroundColor: ["#f3545d", "#177dff"],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom' }
+          }
+        }
+      });
+    }
+
+    // ===== Bar Chart (Follow-Ups) =====
+    if (barCanvas && Array.isArray(barData)) {
+      const barColors = ["#177dff", "#ffa534", "#f3545d"];
+      const finalColors = barColors.slice(0, barData.length);
+
+      new Chart(barCanvas, {
+        type: "bar",
+        data: {
+          labels: barLabels,
+          datasets: [{
+            label: 'Follow-Up Metrics',
+            data: barData,
+            backgroundColor: finalColors,
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                callback: function (value) {
+                  return value.toLocaleString();
+                }
+              }
+            }
+          },
+          plugins: {
+            legend: { display: true }
+          }
+        }
+      });
+    }
+
+    // Optional Notify on charts loaded
+    if (typeof $.notify === "function") {
+      $.notify({
+        message: 'Charts loaded successfully!'
+      }, {
+        type: 'success',
+        delay: 2000,
+        placement: { from: "top", align: "right" }
+      });
+    }
+  });
+</script>
+{% endblock %}
